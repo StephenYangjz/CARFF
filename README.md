@@ -18,7 +18,7 @@ pip install -r requirements.txt
 ### Configuration setup
 Modify experiment parameters and data path to point to local copy in `dec_cond_vae.yaml`:
 ```
-data_path: "../town4_new_merged"
+data_path: "../carla_town1_data"
 ```
 ### Train PC-VAE on the dataset
 ```
