@@ -15,6 +15,16 @@ pip install -r requirements.txt
 ```
 
 ## Running Experiments
+### Configuration setup
+Modify experiment parameters and data path to point to local copy in `dec_cond_vae.yaml`:
 ```
+data_path: "../town4_new_merged"
+```
+### Train PC-VAE on the dataset
+```
+# With constant KLD loss weight
+python run.py -c configs/dec_cond_vae.yaml
 
+# With KLD delayed linear scheduling
+python run.py -c configs/dec_cond_vae.yaml --kld_scheduler True
 ```

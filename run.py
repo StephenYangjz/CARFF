@@ -21,23 +21,32 @@ parser = argparse.ArgumentParser(description='Generic runner for VAE models')
 parser.add_argument('--config',  '-c',
                     dest="filename",
                     metavar='FILE',
-                    help =  'path to the config file',
-                    default='configs/vae.yaml')
+                    help="Path to the config file",
+                    default='configs/dec_cond_vae.yaml')
 parser.add_argument('--wandb_name',
                     type=str,
-                    default="")
+                    default="pcvae_test_run",
+                    help="Name of the wandb run")
 parser.add_argument('--wandb_toggle', '-w',
                     type=bool,
-                    default=True)
+                    default=False,
+                    help="Toggle to enable Wandb logging")
 parser.add_argument('--wandb_project',
                     type=str,
-                    default="pytorch-vae-run")
+                    default="pytorch-vae-run",
+                    help="Name of the registered Wandb project")
+parser.add_argument('--wandb_entity',
+                    type=str,
+                    default="carff",
+                    help="Name of the registered Wandb entity")
 parser.add_argument('--kld_scheduler',
                     type=bool,
-                    default=False)
+                    default=False,
+                    help="Turn on delayed linear KLD scheduling based on parameters in config file")
 parser.add_argument('--load_ckpt',
                     type=str,
-                    default="")
+                    default="",
+                    help="Load the checkpoint using the path")
 
 args = parser.parse_args()
 with open(args.filename, 'r') as file:
@@ -84,9 +93,9 @@ except KeyError:
 # setup wandb
 if args.wandb_toggle:
     if (args.wandb_name == ""):
-        wandb_run = wandb.init(project=args.wandb_project, entity="carff", config=config)
+        wandb_run = wandb.init(project=args.wandb_project, entity=args.wandb_entity, config=config)
     else:
-        wandb_run = wandb.init(project=args.wandb_project, entity="carff", config=config, name=args.wandb_name)
+        wandb_run = wandb.init(project=args.wandb_project, entity=args.wandb_entity, config=config, name=args.wandb_name)
 
 if args.load_ckpt == "":
     experiment = VAEXperiment(model,
