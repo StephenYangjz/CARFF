@@ -84,9 +84,9 @@ except KeyError:
 # setup wandb
 if args.wandb_toggle:
     if (args.wandb_name == ""):
-        wandb_run = wandb.init(project=args.wandb_project, entity="dynamic-perceiver", config=config)
+        wandb_run = wandb.init(project=args.wandb_project, entity="carff", config=config)
     else:
-        wandb_run = wandb.init(project=args.wandb_project, entity="dynamic-perceiver", config=config, name=args.wandb_name)
+        wandb_run = wandb.init(project=args.wandb_project, entity="carff", config=config, name=args.wandb_name)
 
 if args.load_ckpt == "":
     experiment = VAEXperiment(model,
