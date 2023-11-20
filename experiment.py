@@ -31,9 +31,6 @@ class VAEXperiment(pl.LightningModule):
                 debug:bool = True,
                 log_params: dict = {}) -> None:
         super(VAEXperiment, self).__init__()
-
-        self.run_number = 0
-
         self.log_params = log_params
 
         self.train_psnrs = []
@@ -127,7 +124,6 @@ class VAEXperiment(pl.LightningModule):
             mus.extend(mu)
             log_vars.extend(log_var)
             latents.extend(z)
-            print("Image batch processed...")
         image_paths_batch = image_paths[-(len(image_paths) % batch_size):]
         image_batch = [dataset.transforms(default_loader(path)).unsqueeze(0) for path in image_paths_batch]
         image_batch = torch.vstack(image_batch)
@@ -136,7 +132,6 @@ class VAEXperiment(pl.LightningModule):
         mus.extend(mu)
         log_vars.extend(log_var)
         latents.extend(z)
-        print("Last image batch processed...")
 
         new_json_file = os.path.join(self.log_params['save_dir'], 'embeddings', transforms_dest)
 
@@ -150,18 +145,17 @@ class VAEXperiment(pl.LightningModule):
         with open(new_json_file, 'w') as f:
             json.dump(transforms, f, indent=4)
 
-        print("Wrote new latents...")
+        print(f'Saved embeddings to {transforms_dest}')
         if self.use_wandb:
             artifact = wandb.Artifact(name=transforms_dest, type="file")
             artifact.add_file(local_path=new_json_file)
             self.wandb_run.log_artifact(artifact)
-        self.run_number += 1
     
     def generate_and_save_val_embeddings(self):
-        self.generate_and_save_embeddings('transforms_val.json', f'transforms_val{self.run_number}.json')
+        self.generate_and_save_embeddings('transforms_val.json', f'transforms_val{self.current_epoch}.json')
     
     def generate_and_save_train_embeddings(self):
-        self.generate_and_save_embeddings('transforms_train.json', f'transforms_train{self.run_number}.json')
+        self.generate_and_save_embeddings('transforms_train.json', f'transforms_train{self.current_epoch}.json')
 
     def increment_kld(self):
         if self.params['kld_weight'] < self.params['kld_max']:
