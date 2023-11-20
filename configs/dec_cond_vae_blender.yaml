@@ -1,0 +1,31 @@
+model_params:
+  name: 'DecoderConditionalVAE'
+  in_channels: 3
+  latent_dim: 8
+  decoder_inputs_onehot: true 
+
+data_params:
+  data_path: "../town4_new_merged"
+  train_batch_size: 64
+  val_batch_size:  64
+  patch_size: 128
+  num_workers: 4
+
+exp_params:
+  LR: 0.004
+  weight_decay: 0.0
+  scheduler_gamma: 0.95
+  kld_weight: 0.000001
+  manual_seed: 1265
+  kld_max: 0.00004
+  kld_start: 30
+  kld_end: 60
+
+trainer_params:
+  gpus: [0]
+  max_epochs: 300
+
+logging_params:
+  save_dir: "logs_code_test/"
+  name: "DecoderConditionalVAE"
+ 
