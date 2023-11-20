@@ -3,8 +3,8 @@ import math
 import torch
 from torch import optim
 from torch.nn import functional as F
-from models import BaseVAE, DecoderConditionalVAE
 from models.types_ import *
+from models import BaseVAE, DecoderConditionalVAE
 from utils import data_loader, save_image_with_axes, PSNR
 import pytorch_lightning as pl
 from torchvision import transforms
