@@ -14,8 +14,6 @@ import json
 from PIL import Image
 from torch.nn import functional as F
 
-ADD_EXTRA_TRAINING = 100
-
 class MyDataset(Dataset):
     def __init__(self):
         pass
