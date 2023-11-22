@@ -181,16 +181,16 @@ class VAEXperiment(pl.LightningModule):
         
     def log_val_psnr(self):
         viz_indices = [6, 34, 62]
-        true_val_dataset = self.trainer.datamodule.true_val_dataset
+        val_dataset = self.trainer.datamodule.val_dataset
         train_metrics_dataset = self.trainer.datamodule.train_metrics_dataset
-        val_metrics_loader = self.trainer.datamodule.true_val_dataloader()
+        val_metrics_loader = self.trainer.datamodule.val_dataloader()
         val_metrics_iter = iter(val_metrics_loader)
         psnrs = []
         for img1_pose, img1, img2_pose, _, info in val_metrics_iter:
             img1_scene = info['scene_id']
             img2_hat, _, _, _ = self.forward(img1.cuda(), img2_pose.cuda())
             for i, scene_id in enumerate(img1_scene):
-                idx = true_val_dataset.scene_and_view_to_idx[(scene_id.item(), img2_pose[i].item())]
+                idx = val_dataset.scene_and_view_to_idx[(scene_id.item(), img2_pose[i].item())]
                 img2 = train_metrics_dataset.transforms(default_loader(train_metrics_dataset.imgs[idx]['image_path']))
                 img2 = F.interpolate(img2.unsqueeze(0), [128, 128], mode='bilinear', align_corners=True)
                 img1 = F.interpolate(img1, [128, 128], mode='bilinear', align_corners=True)
@@ -226,8 +226,8 @@ class VAEXperiment(pl.LightningModule):
             self.wandb_log = {}
 
     def sample_images(self):
-        loader = self.trainer.datamodule.test_dataloader()
-        dataset = self.trainer.datamodule.val_dataset
+        loader = self.trainer.datamodule.train_dataloader()
+        dataset = self.trainer.datamodule.train_dataset
         img1_pose, img1, _, _, info = next(iter(loader))
 
         N_VAL_IMAGES = 8
@@ -283,7 +283,7 @@ class VAEXperiment(pl.LightningModule):
         enc_og_view = torch.Tensor(enc_og_view).cuda()
         separator = torch.zeros_like(enc_og_view).cuda()
 
-        dataset = self.trainer.datamodule.val_dataset
+        dataset = self.trainer.datamodule.train_dataset
         transform = transforms.Compose([
             transforms.Resize(self.trainer.datamodule.patch_size),             
         ])

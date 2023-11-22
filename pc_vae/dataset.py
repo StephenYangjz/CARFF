@@ -126,6 +126,7 @@ class VAEDataset(LightningDataModule):
         val_batch_size: int = 12,
         patch_size: Union[int, Sequence[int]] = (256, 256),
         num_workers: int = 0,
+        add_extra_training: int = 100
         pin_memory: bool = False,
         **kwargs,
     ):
@@ -154,15 +155,7 @@ class VAEDataset(LightningDataModule):
             split='train',
             transform=train_transforms,
             download=False,
-            add_extra_training=ADD_EXTRA_TRAINING
-        )
-        
-        self.val_dataset = DidacticBlenderDatasetPoseBatching(
-            self.data_dir,
-            split='train',
-            transform=val_transforms,
-            download=False,
-            add_extra_training=ADD_EXTRA_TRAINING
+            add_extra_training=add_extra_training
         )
 
         self.train_metrics_dataset = DidacticBlenderDatasetPoseBatching(
@@ -172,7 +165,7 @@ class VAEDataset(LightningDataModule):
             download=False
         )
 
-        self.true_val_dataset = DidacticBlenderDatasetPoseBatching(
+        self.val_dataset = DidacticBlenderDatasetPoseBatching(
             self.data_dir,
             split='val', 
             transform=val_transforms,
@@ -187,24 +180,6 @@ class VAEDataset(LightningDataModule):
             shuffle=True,
             pin_memory=self.pin_memory,
         )
-
-    def val_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
-        return DataLoader(
-            self.train_dataset,
-            batch_size=self.val_batch_size,
-            num_workers=self.num_workers,
-            shuffle=False,
-            pin_memory=self.pin_memory,
-        )
-    
-    def test_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
-        return DataLoader(
-            self.train_dataset,
-            batch_size=self.val_batch_size,
-            num_workers=self.num_workers,
-            shuffle=True,
-            pin_memory=self.pin_memory,
-        )
     
     def train_metrics_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
         return DataLoader(
@@ -215,7 +190,7 @@ class VAEDataset(LightningDataModule):
             pin_memory=self.pin_memory,
         )
     
-    def true_val_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
+    def val_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
         return DataLoader(
             self.true_val_dataset,
             batch_size=self.val_batch_size,

@@ -10,6 +10,7 @@ data_params:
   val_batch_size:  64
   patch_size: 128
   num_workers: 4
+  add_extra_training: 100
 
 exp_params:
   LR: 0.004
