@@ -29,7 +29,7 @@ parser.add_argument('--wandb_name',
                     help="Name of the wandb run")
 parser.add_argument('--wandb_toggle', '-w',
                     type=bool,
-                    default=False,
+                    default=True,
                     help="Toggle to enable Wandb logging")
 parser.add_argument('--wandb_project',
                     type=str,
@@ -92,10 +92,7 @@ except KeyError:
 
 # setup wandb
 if args.wandb_toggle:
-    if (args.wandb_name == ""):
-        wandb_run = wandb.init(project=args.wandb_project, entity=args.wandb_entity, config=config)
-    else:
-        wandb_run = wandb.init(project=args.wandb_project, entity=args.wandb_entity, config=config, name=args.wandb_name)
+    wandb_run = wandb.init(project=args.wandb_project, entity=args.wandb_entity, config=config, name=args.wandb_name)
 
 if args.load_ckpt == "":
     experiment = VAEXperiment(model,

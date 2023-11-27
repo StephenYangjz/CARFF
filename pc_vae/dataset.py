@@ -124,7 +124,7 @@ class VAEDataset(LightningDataModule):
         val_batch_size: int = 12,
         patch_size: Union[int, Sequence[int]] = (256, 256),
         num_workers: int = 0,
-        add_extra_training: int = 100
+        add_extra_training: int = 100,
         pin_memory: bool = False,
         **kwargs,
     ):
@@ -153,7 +153,7 @@ class VAEDataset(LightningDataModule):
             split='train',
             transform=train_transforms,
             download=False,
-            add_extra_training=add_extra_training
+            add_extra_training=100
         )
 
         self.train_metrics_dataset = DidacticBlenderDatasetPoseBatching(
@@ -190,7 +190,7 @@ class VAEDataset(LightningDataModule):
     
     def val_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
         return DataLoader(
-            self.true_val_dataset,
+            self.val_dataset,
             batch_size=self.val_batch_size,
             num_workers=self.num_workers,
             shuffle=False,

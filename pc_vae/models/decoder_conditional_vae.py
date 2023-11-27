@@ -4,7 +4,7 @@ from torch import nn
 from torch.nn import functional as F
 from .types_ import *
 from vit_pytorch import SimpleViT
-from torchvision.models import vit_b_16, resnet50, ResNet50_Weights, mobilenet_v2, MobileNet_V2_Weights
+from torchvision.models import vit_l_16, resnet50, ResNet50_Weights, mobilenet_v2, MobileNet_V2_Weights
 
 class DecoderConditionalVAE(VanillaVAE):
     def __init__(self,
@@ -39,7 +39,7 @@ class DecoderConditionalVAE(VanillaVAE):
              nn.BatchNorm2d(3),
              nn.LeakyReLU()))
 
-        vit = vit_b_16(
+        vit = vit_l_16(
             weights="IMAGENET1K_V1",
             image_size=224
         )
@@ -49,10 +49,13 @@ class DecoderConditionalVAE(VanillaVAE):
         self.fc_var = nn.Linear(1000, latent_dim)
 
         self.encoder = nn.Sequential(*modules)
-
+        
         for name, param in self.encoder.named_parameters():
             if param.requires_grad:
                 param.requires_grad = False
+
+        for param in self.encoder[0].parameters():
+            param.requires_grad = True
 
         modules = []
 
