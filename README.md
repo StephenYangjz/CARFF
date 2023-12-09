@@ -36,13 +36,15 @@ The input image is encoded using pre-trained PC-VAE to obtain a latent distribut
 
 From the number of samples starting at 0 to 50, the belief state coverage generated under partial observation (recall), and the proportion of correct beliefs sampled under full observation (accuracy) is plotted for predicted beliefs. There is an ideal margin between the two as shown in the curves above for the two Multi-Scene CARLA datasets used to train our model.
 
-![recall_acc_curves](./images/recall_acc_curves.png)
+<!-- ![recall_acc_curves](./images/recall_acc_curves.png) -->
+<img src="./images/recall_acc_curves.png" alt="drawing" width="300"/>
 
 ### CARFF planning with controllers
 
 CARFF-based controllers outperform baseline controllers by choosing the optimal action in potential collision scenarios over all 30 trials conducted.
 
-![controller](./images/controller.png)
+<!-- ![controller](./images/controller.png, ) -->
+<img src="./images/controller.png" alt="drawing" width="300"/>
 
 ## License and Citation
 
