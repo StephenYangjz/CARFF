@@ -56,7 +56,8 @@ CARFF-based controllers outperform baseline controllers by choosing the optimal 
 
 ## License and Citation
 
-```bibtex
+Anonymized 
+<!-- ```bibtex
 @article{yang2023carff,
   title={{CARFF}: Conditional Auto-encoded Radiance Field for 3D Scene Forecasting},
   author={Yang, Jiezhi ``Stephen'' and Desai, Khushi and Bhatia, Harshil
@@ -64,4 +65,4 @@ CARFF-based controllers outperform baseline controllers by choosing the optimal 
   journal={arXiv preprint arXiv},
   year={2023}
 }
-```
+``` -->
