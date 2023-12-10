@@ -46,6 +46,14 @@ CARFF-based controllers outperform baseline controllers by choosing the optimal 
 <!-- ![controller](./images/controller.png, ) -->
 <img src="./images/controller.png" alt="drawing" width="300"/>
 
+## Related Works
+![related](./images/related_works.png)
+
+[[1] NeRF-VAE: A Geometry Aware 3D Scene Generative Model (ICML 2021)](https://arxiv.org/abs/2104.00587)\
+[[2] 3D Neural Scene Representations for Visuomotor Control (CoRL 2021)](https://arxiv.org/abs/2107.04004)\
+[[3] Vision-Only Robot Navigation in a Neural Radiance World (IEEE 2022)](https://arxiv.org/abs/2110.00168)\
+[[4] Is Anyone There? Learning a Planner Contingent on Perceptual Uncertainty (CoRL 2022)](https://openreview.net/forum?id=2CSj965d9O4)
+
 ## License and Citation
 
 ```bibtex
