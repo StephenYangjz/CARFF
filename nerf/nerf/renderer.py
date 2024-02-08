@@ -123,7 +123,7 @@ class NeRFRenderer(nn.Module):
         self.mean_count = 0
         self.local_step = 0
 
-    def run(self, rays_o, rays_d, num_steps=128, upsample_steps=128, bg_color=None, perturb=False, **kwargs):
+    def run(self, rays_o, rays_d, num_steps=128, upsample_steps=128, bg_color=None, perturb=False, timestamp=None, **kwargs):
 
         prefix = rays_o.shape[:-1]
         rays_o = rays_o.contiguous().view(-1, 3)
@@ -236,7 +236,7 @@ class NeRFRenderer(nn.Module):
         }
 
 
-    def run_cuda(self, rays_o, rays_d, latents, dt_gamma=0, bg_color=None, perturb=False, force_all_rays=False, max_steps=1024, **kwargs):
+    def run_cuda(self, rays_o, rays_d, latents, dt_gamma=0, bg_color=None, perturb=False, force_all_rays=False, max_steps=1024, timestamp=None, **kwargs):
         # rays_o, rays_d: [B, N, 3], assumes B == 1
         # return: image: [B, N, 3], depth: [B, N]
 
@@ -252,6 +252,8 @@ class NeRFRenderer(nn.Module):
             print(latents.shape)
             raise
         '''
+
+        mean_densities = []
 
         N = rays_o.shape[0] # N = B * N, in fact
         device = rays_o.device
@@ -342,8 +344,49 @@ class NeRFRenderer(nn.Module):
                     raise
                 sigmas, rgbs = self(xyzs, dirs, unwrapped_latents)
                 sigmas = self.density_scale * sigmas
-                raymarching.composite_rays(n_alive, n_step, rays_alive[i % 2], rays_t[i % 2], sigmas.float(), rgbs.float(), deltas, weights_sum, depth, image)
 
+                # Calculate densities based on inputted target timestamp
+                tolerance = 0.07
+
+                target_locations = {}
+                car_locations = {}
+                # T0 truck location
+                target_locations[0] = torch.tensor([0.15180872, 0.03262607, -0.33373854]).to(xyzs.get_device())
+                car_locations[0] = torch.tensor([0.14536471, 0.01380782, -0.07035845]).to(xyzs.get_device()) 
+                # T1 truck location
+                target_locations[1] = torch.tensor([0.14806952, 0.03101616, -0.08544287]).to(xyzs.get_device())
+                car_locations[1] = torch.tensor([0.1389209, 0.02671495, 0.16611843]).to(xyzs.get_device()) 
+                # T2 truck location
+                target_locations[2] = torch.tensor([0.14524707, 0.03038827, 0.16848531]).to(xyzs.get_device())
+                car_locations[2] = torch.tensor([0.13999184, 0.01417865, 0.39448936]).to(xyzs.get_device()) 
+                # T3 truck location
+                target_locations[3] = torch.tensor([0.15180872, 0.03262607, -0.33373854]).to(xyzs.get_device())
+                car_locations[3] = torch.tensor([0.14536471, 0.01380782, -0.07035845]).to(xyzs.get_device()) 
+                # T4 truck location
+                target_locations[4] = torch.tensor([0.14655751, 0.0297241, -0.25873851]).to(xyzs.get_device())
+                car_locations[4] = torch.tensor([0.1389209, 0.02671495, 0.16611843]).to(xyzs.get_device()) 
+                # T5 truck location
+                target_locations[5] = torch.tensor([0.14339805, 0.03065605, -0.19418989]).to(xyzs.get_device())
+                car_locations[5] =  torch.tensor([0.13999184, 0.01417865, 0.39448936]).to(xyzs.get_device())
+
+                if timestamp is not None:
+                    target_location = target_locations[timestamp]
+                    distances = torch.norm(xyzs - target_location, dim=-1)
+                    close_to_target = distances < tolerance
+
+                    car_location = car_locations[timestamp]
+                    car_distances = torch.norm(xyzs - car_location, dim=-1)
+                    close_to_car = car_distances < tolerance
+
+                    selected_densities = sigmas[close_to_target]
+                    selected_car_densities = sigmas[close_to_car]
+                    if len(selected_densities) > 0:
+                        mean_densities.append(torch.mean(selected_densities).item())
+                    if len(selected_car_densities) > 0:
+                        mean_densities.append(torch.mean(selected_car_densities).item())
+                        
+                raymarching.composite_rays(n_alive, n_step, rays_alive[i % 2], rays_t[i % 2], sigmas.float(), rgbs.float(), deltas, weights_sum, depth, image)
+                
                 step += n_step
                 i += 1
 
@@ -351,11 +394,11 @@ class NeRFRenderer(nn.Module):
             depth = torch.clamp(depth - nears, min=0) / (fars - nears)
             image = image.view(*prefix, 3)
             depth = depth.view(*prefix)
-        # print("not training branch")
 
         return {
             'depth': depth,
             'image': image,
+            'mean_density': mean_density
         }
 
     @torch.no_grad()
@@ -525,7 +568,7 @@ class NeRFRenderer(nn.Module):
             self.mean_count = int(self.step_counter[:total_step, 0].sum().item() / total_step)
         self.local_step = 0
 
-    def render(self, rays_o, rays_d, latents, staged=False, max_ray_batch=4096, **kwargs):
+    def render(self, rays_o, rays_d, latents, staged=False, max_ray_batch=4096, timestamp=None, **kwargs):
 
         if self.cuda_ray:
             _run = self.run_cuda
@@ -555,6 +598,6 @@ class NeRFRenderer(nn.Module):
             results['image'] = image
 
         else:
-            results = _run(rays_o, rays_d, latents, **kwargs)
+            results = _run(rays_o, rays_d, latents, timestamp=timestamp, **kwargs)
 
         return results
