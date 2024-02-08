@@ -174,6 +174,24 @@ class NeRFGUI:
         print("Input correspinds to:", self.train_loader._data.paths[indices[0]])
         return indices[0]
 
+    def calculate_densities(self, timestamp):
+        indices = {}
+        for i, item in enumerate(self.train_loader._data.paths):
+            if item.startswith("train/cam-v2-") or item.startswith("train_ego_actor/cam-v2-"):
+                indices[item] = i
+        # print(indices)
+        if len(indices) == 0:
+            raise ValueError("Dataset not supported for probing.")
+        rand_index = indices[list(indices.keys())[0]]
+        data = self.train_loader._data.collate_for_probe([rand_index])
+        H, W = data['H'], data['W']
+
+        latents = self.test_latent.cuda().float()
+        poses = self.train_loader._data.poses[rand_index].cpu().numpy() # [B, 4, 4]
+        intrinsics = self.train_loader._data.intrinsics
+        outputs = self.trainer.test_gui(poses, intrinsics, W, H, latents, bg_color=None, spp=1, downscale=1, timestamp=timestamp)
+        return outputs['mean_density']
+
     def probe(self):
         indices = {}
         for i, item in enumerate(self.train_loader._data.paths):
