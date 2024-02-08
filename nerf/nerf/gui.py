@@ -203,6 +203,18 @@ class NeRFGUI:
         # get the distribution for that result
         return indices[probed_result]
 
+    def probe_densities(self):
+        indices = {}
+        for i, item in enumerate(self.train_loader._data.paths):
+            if item.startswith("train/cam-v2-") or item.startswith("train_ego_actor/cam-v2-"):
+                indices[item] = i
+        densities = {}
+        for i in range(6):
+            densities[i] = self.calculate_densities(i)
+        probed_result = max(densities, key=densities.get)
+        result_index = indices[sorted(indices.keys())[probed_result]]
+        return probed_result, result_index
+
     def register_dpg(self):
 
         ### register texture 
@@ -393,7 +405,23 @@ class NeRFGUI:
                     self.need_update = True
                     print("Successfully transferred to the next stage based on probed result.")
 
+                def callback_probe_density(sender, app_data):
+                    _, result_index = self.probe_densities()
+                    mus = self.train_loader._data.mus[result_index].cuda()
+                    vars = self.train_loader._data.vars[result_index].cuda()
+                    # one hot encode
+                    one_hot_encode = F.one_hot(torch.tensor([self.current_t]), self.train_loader._data.num_scenes).cuda()
+                    input_data = torch.cat([mus, vars]).unsqueeze(0).cuda()
+                    sampled_latent, weight, mu, sigma = self.MDN.sample(input_data)
+                    predicted_latent = sampled_latent.squeeze(0)
+                    current_t, _ = self.probe_densities()
+                    print("Predicted:", current_t)
+                    self.test_latent = predicted_latent
+                    self.need_update = True
+                    print("Successfully transferred to the next stage based on probed density of result.")
+
                 dpg.add_button(label="Probe and predict", tag="_button_probe", callback=callback_probe_car)
+                dpg.add_button(label="Probe and predict density", tag="_button_probe_density", callback=callback_probe_density)
 
                 def callback_psnr(sender, app_data):
                     indices = {}
