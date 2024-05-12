@@ -233,6 +233,25 @@ class NeRFGUI:
         result_index = indices[sorted(indices.keys())[probed_result]]
         return probed_result, result_index
 
+    def update_latent_from_predicted(self, result_index):
+        # update test_latent
+        if result_index == -1:
+            print("Error: input image path invalid for latent generation")
+            return
+        # update test_latent
+        print("Index:", result_index)
+        mus = self.train_loader._data.mus[result_index].cuda()
+        vars = self.train_loader._data.vars[result_index].cuda()
+        # one hot encode
+        one_hot_encode = F.one_hot(torch.tensor([self.current_t]), self.train_loader._data.num_scenes).cuda()
+        input_data = torch.cat([mus, vars]).unsqueeze(0).cuda()
+        sampled_latent, weight, mu, sigma = self.MDN.sample(input_data)
+        predicted_latent = sampled_latent.squeeze(0)
+        # probe current t
+        # self.current_t = int(self.train_loader._data.scene_ids[self.probe()])
+        self.test_latent = predicted_latent
+        self.need_update = True
+
     def register_dpg(self):
 
         ### register texture 
