@@ -174,6 +174,24 @@ class NeRFGUI:
         print("Input correspinds to:", self.train_loader._data.paths[indices[0]])
         return indices[0]
 
+    def calculate_densities(self, timestamp):
+        indices = {}
+        for i, item in enumerate(self.train_loader._data.paths):
+            if item.startswith("train/cam-v2-") or item.startswith("train_ego_actor/cam-v2-"):
+                indices[item] = i
+        # print(indices)
+        if len(indices) == 0:
+            raise ValueError("Dataset not supported for probing.")
+        rand_index = indices[list(indices.keys())[0]]
+        data = self.train_loader._data.collate_for_probe([rand_index])
+        H, W = data['H'], data['W']
+
+        latents = self.test_latent.cuda().float()
+        poses = self.train_loader._data.poses[rand_index].cpu().numpy() # [B, 4, 4]
+        intrinsics = self.train_loader._data.intrinsics
+        outputs = self.trainer.test_gui(poses, intrinsics, W, H, latents, bg_color=None, spp=1, downscale=1, timestamp=timestamp)
+        return outputs['mean_density']
+
     def probe(self):
         indices = {}
         for i, item in enumerate(self.train_loader._data.paths):
@@ -202,6 +220,37 @@ class NeRFGUI:
         probed_result = min(losses, key=losses.get)
         # get the distribution for that result
         return indices[probed_result]
+
+    def probe_densities(self):
+        indices = {}
+        for i, item in enumerate(self.train_loader._data.paths):
+            if item.startswith("train/cam-v2-") or item.startswith("train_ego_actor/cam-v2-"):
+                indices[item] = i
+        densities = {}
+        for i in range(6):
+            densities[i] = self.calculate_densities(i)
+        probed_result = max(densities, key=densities.get)
+        result_index = indices[sorted(indices.keys())[probed_result]]
+        return probed_result, result_index
+
+    def update_latent_from_predicted(self, result_index):
+        # update test_latent
+        if result_index == -1:
+            print("Error: input image path invalid for latent generation")
+            return
+        # update test_latent
+        print("Index:", result_index)
+        mus = self.train_loader._data.mus[result_index].cuda()
+        vars = self.train_loader._data.vars[result_index].cuda()
+        # one hot encode
+        one_hot_encode = F.one_hot(torch.tensor([self.current_t]), self.train_loader._data.num_scenes).cuda()
+        input_data = torch.cat([mus, vars]).unsqueeze(0).cuda()
+        sampled_latent, weight, mu, sigma = self.MDN.sample(input_data)
+        predicted_latent = sampled_latent.squeeze(0)
+        # probe current t
+        # self.current_t = int(self.train_loader._data.scene_ids[self.probe()])
+        self.test_latent = predicted_latent
+        self.need_update = True
 
     def register_dpg(self):
 
@@ -393,7 +442,23 @@ class NeRFGUI:
                     self.need_update = True
                     print("Successfully transferred to the next stage based on probed result.")
 
+                def callback_probe_density(sender, app_data):
+                    _, result_index = self.probe_densities()
+                    mus = self.train_loader._data.mus[result_index].cuda()
+                    vars = self.train_loader._data.vars[result_index].cuda()
+                    # one hot encode
+                    one_hot_encode = F.one_hot(torch.tensor([self.current_t]), self.train_loader._data.num_scenes).cuda()
+                    input_data = torch.cat([mus, vars]).unsqueeze(0).cuda()
+                    sampled_latent, weight, mu, sigma = self.MDN.sample(input_data)
+                    predicted_latent = sampled_latent.squeeze(0)
+                    current_t, _ = self.probe_densities()
+                    print("Predicted:", current_t)
+                    self.test_latent = predicted_latent
+                    self.need_update = True
+                    print("Successfully transferred to the next stage based on probed density of result.")
+
                 dpg.add_button(label="Probe and predict", tag="_button_probe", callback=callback_probe_car)
+                dpg.add_button(label="Probe and predict density", tag="_button_probe_density", callback=callback_probe_density)
 
                 def callback_psnr(sender, app_data):
                     indices = {}
