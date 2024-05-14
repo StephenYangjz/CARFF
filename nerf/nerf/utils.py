@@ -476,7 +476,7 @@ class Trainer(object):
         return pred_rgb, pred_depth, gt_rgb, loss
 
     # moved out bg_color and perturb for more flexible control...
-    def test_step(self, data, bg_color=None, perturb=False):  
+    def test_step(self, data, bg_color=None, perturb=False, timestamp=None):  
 
         rays_o = data['rays_o'] # [B, N, 3]
         rays_d = data['rays_d'] # [B, N, 3]
@@ -487,12 +487,13 @@ class Trainer(object):
             bg_color = bg_color.to(self.device)
 
         # NOTE: need to modify to pass latent info through
-        outputs = self.model.render(rays_o, rays_d, latents, staged=True, bg_color=bg_color, perturb=perturb, **vars(self.opt))
+        outputs = self.model.render(rays_o, rays_d, latents, staged=True, bg_color=bg_color, perturb=perturb, timestamp=timestamp, **vars(self.opt))
 
         pred_rgb = outputs['image'].reshape(-1, H, W, 3)
         pred_depth = outputs['depth'].reshape(-1, H, W)
+        mean_density = outputs['mean_density']
 
-        return pred_rgb, pred_depth
+        return pred_rgb, pred_depth, mean_density
 
 
     def save_mesh(self, save_path=None, resolution=256, threshold=10):
