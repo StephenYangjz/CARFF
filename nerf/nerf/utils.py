@@ -657,7 +657,7 @@ class Trainer(object):
 
     
     # [GUI] test on a single image
-    def test_gui(self, pose, intrinsics, W, H, latents, bg_color=None, spp=1, downscale=1):
+    def test_gui(self, pose, intrinsics, W, H, latents, bg_color=None, spp=1, downscale=1, timestamp=None):
         
         # render resolution (may need downscale to for better frame rate)
         rH = int(H * downscale)
@@ -694,7 +694,7 @@ class Trainer(object):
         with torch.no_grad():
             with torch.cuda.amp.autocast(enabled=self.fp16):
                 # here spp is used as perturb random seed!
-                preds, preds_depth = self.test_step(data, bg_color=bg_color, perturb=spp)
+                preds, preds_depth, mean_density = self.test_step(data, bg_color=bg_color, perturb=spp, timestamp=timestamp)
 
         if self.ema is not None:
             self.ema.restore()
@@ -714,6 +714,7 @@ class Trainer(object):
         outputs = {
             'image': pred,
             'depth': pred_depth,
+            'mean_density': mean_density
         }
 
         return outputs
