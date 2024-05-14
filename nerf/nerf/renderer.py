@@ -394,7 +394,8 @@ class NeRFRenderer(nn.Module):
             depth = torch.clamp(depth - nears, min=0) / (fars - nears)
             image = image.view(*prefix, 3)
             depth = depth.view(*prefix)
-
+            
+        mean_density = np.mean(mean_densities) if len(mean_densities) > 0 else 0.0
         return {
             'depth': depth,
             'image': image,
