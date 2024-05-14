@@ -17,6 +17,9 @@ conda env create -f environment.yml
 conda activate torch-ngp
 ```
 
+### Raymarching import errors
+If the error or similar errors detailed in this [GitHub issue](https://github.com/ashawkey/torch-ngp/issues/184) appears, navigate to `raymarching/backend.py` and change all instances of `c++14` to `c++17`.
+
 
 # Usage
 
