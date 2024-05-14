@@ -66,6 +66,8 @@ class OrbitCamera:
 
 class NeRFGUI:
     def __init__(self, opt, trainer, train_loader=None, debug=True, gui=True):
+        self.gui = gui
+        
         self.opt = opt # shared with the trainer's opt to support in-place modification of rendering parameters.
         self.W = opt.W
         self.H = opt.H
@@ -120,8 +122,9 @@ class NeRFGUI:
         self.step += self.train_steps
         self.need_update = True
 
-        dpg.set_value("_log_train_time", f'{t:.4f}ms')
-        dpg.set_value("_log_train_log", f'step = {self.step: 5d} (+{self.train_steps: 2d}), loss = {outputs["loss"]:.4f}, lr = {outputs["lr"]:.5f}')
+        if self.gui:
+            dpg.set_value("_log_train_time", f'{t:.4f}ms')
+            dpg.set_value("_log_train_log", f'step = {self.step: 5d} (+{self.train_steps: 2d}), loss = {outputs["loss"]:.4f}, lr = {outputs["lr"]:.5f}')
 
         # dynamic train steps
         # max allowed train time per-frame is 500 ms
@@ -158,11 +161,12 @@ class NeRFGUI:
             else:
                 self.render_buffer = (self.render_buffer * self.spp + outputs['image']) / (self.spp + 1)
                 self.spp += 1
-
-            dpg.set_value("_log_infer_time", f'{t:.4f}ms')
-            dpg.set_value("_log_resolution", f'{int(self.downscale * self.W)}x{int(self.downscale * self.H)}')
-            dpg.set_value("_log_spp", self.spp)
-            dpg.set_value("_texture", self.render_buffer)
+                
+            if self.gui:
+                dpg.set_value("_log_infer_time", f'{t:.4f}ms')
+                dpg.set_value("_log_resolution", f'{int(self.downscale * self.W)}x{int(self.downscale * self.H)}')
+                dpg.set_value("_log_spp", self.spp)
+                dpg.set_value("_texture", self.render_buffer)
 
     def find_index(self, input):
         indices = [index for index, path in enumerate(self.train_loader._data.paths) if input in path]
