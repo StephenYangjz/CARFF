@@ -252,6 +252,12 @@ class NeRFGUI:
         self.test_latent = predicted_latent
         self.need_update = True
 
+    def render_no_gui(self, epochs):
+        for _ in tqdm(range(epochs)):
+            if self.training:
+                self.train_step()
+            self.test_step()
+
     def register_dpg(self):
 
         ### register texture 
