@@ -65,7 +65,7 @@ class OrbitCamera:
 
 
 class NeRFGUI:
-    def __init__(self, opt, trainer, train_loader=None, debug=True):
+    def __init__(self, opt, trainer, train_loader=None, debug=True, gui=True):
         self.opt = opt # shared with the trainer's opt to support in-place modification of rendering parameters.
         self.W = opt.W
         self.H = opt.H
@@ -95,7 +95,8 @@ class NeRFGUI:
         self.train_steps = 16
 
         dpg.create_context()
-        self.register_dpg()
+        if gui:
+            self.register_dpg()
         self.test_step()
 
         latent_dim = self.test_latent.shape[0]
@@ -103,13 +104,10 @@ class NeRFGUI:
         self.MDN.load(self.train_loader._data.root_path)
         print("MDN Path:", self.train_loader._data.root_path)
 
-
     def __del__(self):
         dpg.destroy_context()
-
-
+        
     def train_step(self):
-
         starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
         starter.record()
 
@@ -132,7 +130,6 @@ class NeRFGUI:
         if train_steps > self.train_steps * 1.2 or train_steps < self.train_steps * 0.8:
             self.train_steps = train_steps
 
-    
     def test_step(self):
         if self.need_update or self.spp < self.opt.max_spp:
         
@@ -173,6 +170,26 @@ class NeRFGUI:
             return -1
         print("Input correspinds to:", self.train_loader._data.paths[indices[0]])
         return indices[0]
+
+    def render_bev(self, dest_path=None):
+        indices = {}
+        for i, item in enumerate(self.train_loader._data.paths):
+            if item.startswith("train/cam-v2-") or item.startswith("train_ego_actor/cam-v2-"):
+                indices[item] = i
+        if len(indices) == 0:
+            raise ValueError("Dataset not supported for probing.")
+        rand_index = indices[list(indices.keys())[0]]
+        data = self.train_loader._data.collate_for_probe([rand_index])
+        H, W = data['H'], data['W']
+        
+        latents = self.test_latent.cuda().float()
+        poses = self.train_loader._data.poses[rand_index].cpu().numpy() # [B, 4, 4]
+        intrinsics = self.train_loader._data.intrinsics
+        outputs = self.trainer.test_gui(poses, intrinsics, W, H, latents, bg_color=None, spp=1, downscale=1)
+        pred_img = torch.from_numpy(outputs['image'])
+        if dest_path is not None:
+            save_image(pred_img.permute(2, 0, 1), dest_path)
+        return pred_img
 
     def calculate_densities(self, timestamp):
         indices = {}
@@ -430,8 +447,6 @@ class NeRFGUI:
                     update_latent_from_predicted(app_data)
                 dpg.add_input_text(label="Predict img (v0-t0)", default_value="", callback=callback_predict_latent_from_input, on_enter=True)
 
-
-                
                 def callback_probe_car(sender, app_data):
                     result_index = self.probe()
                     mus = self.train_loader._data.mus[result_index].cuda()
