@@ -275,7 +275,7 @@ class NeRFGUI:
         self.need_update = True
 
     def render_no_gui(self, epochs):
-        for _ in tqdm(range(epochs)):
+        for _ in tqdm.tqdm(range(epochs)):
             if self.training:
                 self.train_step()
             self.test_step()
