@@ -1,4 +1,4 @@
-# CARFF: Conditional Auto-encoded Radiance Field for Forecasting (ECCV 2024 Submission)
+# CARFF: Conditional Auto-encoded Radiance Field for Forecasting (Accepted to ECCV 2024)
 
 
 [Project Page With Video](https://www.carff.website/)
