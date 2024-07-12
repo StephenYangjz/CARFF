@@ -26,20 +26,20 @@ class TensorDataset(Dataset):
         scene = torch.randint(0, self.num_scenes_temp // 2 - 1, (1,)).item()
 
         start_scene = factor*(self.num_scenes_temp // 2) + (scene)  
-        one_hot_encode = F.one_hot(torch.tensor([scene]), self.num_scenes_temp -1).to(self.device)
+        # one_hot_encode = F.one_hot(torch.tensor([scene]), self.num_scenes_temp -1).to(self.device)
 
         end_scene = start_scene + 1
     
         start_mu = self.all_mus[start_scene][idx]
-        start_latents = self.all_latents[start_scene][idx]
+        # start_latents = self.all_latents[start_scene][idx]
         start_var = self.all_vars[start_scene][idx]
         
         idx = idx + torch.randint(-4, 4, (1,))[0]
-        if idx >= 100:
-            idx = 99
+        if idx >= self.num_scenes:
+            idx = self.num_scenes - 1
         end_mu = self.all_mus[end_scene][idx]
         end_var = self.all_vars[end_scene][idx]
-        end_latents = self.all_latents[end_scene][idx]
+        # end_latents = self.all_latents[end_scene][idx]
 
         gaussian_noise1 = torch.randn(start_mu.shape).cuda() * 0.005
         gaussian_noise2 = torch.randn(start_var.shape).cuda() * 0.005
