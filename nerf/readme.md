@@ -2,15 +2,6 @@
 
 This folder is the NeRF decoder implementation based on the pytorch implementation of [instant-ngp](https://github.com/NVlabs/instant-ngp), as described in [_Instant Neural Graphics Primitives with a Multiresolution Hash Encoding_](https://nvlabs.github.io/instant-ngp/assets/mueller2022instant.pdf).
 
-
-
-
-### Install with pip
-```bash
-pip install -r requirements.txt
-pip install git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
-```
-
 ### Install with conda
 ```bash
 conda env create -f environment.yml
