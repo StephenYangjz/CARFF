@@ -19,11 +19,9 @@ class DecoderConditionalVAE(VanillaVAE):
                  num_decoder_classes: int,
                  num_scenes: int,
                  hidden_dims: List = None,
-                 enable_cheating: bool = False,
                  **kwargs) -> None:
         super(VanillaVAE, self).__init__()
 
-        self.enable_cheating = enable_cheating
         self.latent_dim = latent_dim
         self.num_decoder_classes = num_decoder_classes
         self.decoder_inputs_onehot = decoder_inputs_onehot
@@ -68,8 +66,6 @@ class DecoderConditionalVAE(VanillaVAE):
         # Build the decoder
         modules = []
 
-        if self.enable_cheating:
-            self.extra_decoder_inputs += self.num_scenes
         self.decoder_input = nn.Linear(latent_dim + self.extra_decoder_inputs, hidden_dims[-1] * 4)
 
         hidden_dims.reverse()
@@ -105,9 +101,7 @@ class DecoderConditionalVAE(VanillaVAE):
     """
         Decode using the latent z and pose v. 
     """
-    def decode(self, z: Tensor, v: Tensor, debug_info: dict = None) -> Tensor:
-        if self.enable_cheating:
-            assert debug_info is not None
+    def decode(self, z: Tensor, v: Tensor) -> Tensor:
         assert z.shape[0] == v.shape[0], (z.shape, v.shape)
 
         if self.decoder_inputs_onehot:
@@ -120,10 +114,6 @@ class DecoderConditionalVAE(VanillaVAE):
 
         # Conditioning on pose v by concatenating z and v.
         z_and_v = torch.cat([z, v], dim = 1).cuda()
-        if self.enable_cheating:
-            scene_id = debug_info
-            scene_id = F.one_hot(scene_id, num_classes=self.num_scenes).cuda()
-            z_and_v = torch.cat([z_and_v, scene_id], dim = 1)
 
         result = self.decoder_input(z_and_v)
         result = result.view(-1, 512, 2, 2)
@@ -131,7 +121,7 @@ class DecoderConditionalVAE(VanillaVAE):
         result = self.final_layer(result)
         return result
 
-    def forward(self, img1: Tensor, pose2: Tensor, debug_info: dict = None) -> List[Tensor]:
+    def forward(self, img1: Tensor, pose2: Tensor) -> List[Tensor]:
         mu, log_var = self.encode(img1)
         z = self.reparameterize(mu, log_var)
 
@@ -164,13 +154,13 @@ class DecoderConditionalVAE(VanillaVAE):
         samples = self.decode(z, views)
         return samples
 
-    def generate(self, x: Tensor, v: Tensor = None, debug_info: dict = None, **kwargs) -> Tensor:
+    def generate(self, x: Tensor, v: Tensor = None, **kwargs) -> Tensor:
         if v is None:
             v = self.sample_views(x.shape[0])
             v = v.to(x.device)
         
         assert x.shape[0] == v.shape[0], (x.shape, v.shape)
-        return self.forward(x, v, debug_info=debug_info)[0]
+        return self.forward(x, v)[0]
 
     def generate_mean(self, x: Tensor, v: Tensor = None, **kwargs) -> Tensor:
         if v is None:

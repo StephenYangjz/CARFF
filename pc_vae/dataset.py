@@ -116,12 +116,8 @@ class DidacticBlenderDatasetPoseBatching(DidacticBlenderDataset):
         if self.transforms is not None:
             img1 = self.transforms(img1)
             img2 = self.transforms(img2)
-        
-        info = {
-            'scene_id': img1_scene,
-        }
 
-        return img1_pose, img1, img2_pose, img2, info
+        return img1_pose, img1, img2_pose, img2
 
 """
     Utilizes the DidacticBlender datasets in order to create dataloaders for training, testing and validation. 
