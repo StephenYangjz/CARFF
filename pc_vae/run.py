@@ -29,8 +29,8 @@ parser.add_argument('--wandb_name',
                     help="Name of the wandb run")
 parser.add_argument('--wandb_toggle', '-w',
                     type=bool,
-                    default=True,
-                    help="Toggle to enable Wandb logging")
+                    default=False,
+                    help="Toggle to enable or disable Wandb logging")
 parser.add_argument('--wandb_project',
                     type=str,
                     default="pytorch-vae-run",
