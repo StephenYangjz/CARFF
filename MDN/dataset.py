@@ -6,12 +6,12 @@ import torch.nn.functional as F
 class TensorDataset(Dataset):
     def __init__(self, all_mus, all_vars, all_latents, device):
         assert len(all_mus) == len(all_vars)
+        self.device = device
         self.all_mus = self.lists_to_tensors(all_mus)
         self.all_vars = self.lists_to_tensors(all_vars)
         self.all_latents = self.lists_to_tensors(all_latents)
         self.num_scenes = len(all_mus)
         self.num_scenes_temp = self.num_scenes + 1
-        self.device = device
     
     def lists_to_tensors(self, dictionary):
         for key, value in dictionary.items():
