@@ -23,7 +23,7 @@ Modify the log parameters to point to a directory to save training logs:
 save_dir: "logs_carff_test/"
 ```
 ### Train PC-VAE on the dataset
-By default we log KLD, PSNR, loss, etc. to Weights & Biases. If you are not using W&B then you can utilize the `--wandb_toggle` or `-w` flag to `False`. In order to use W&B logging, you will need to specify the entity name with the `--wandb_entity` flag. 
+By default, we have turned off the Weights & Biases flag. The code does include logging KLD, PSNR, loss, etc. to Weights & Biases if the `--wandb_toggle` flag is set to `True`. In order to use W&B logging, you will need to specify the entity name with the `--wandb_entity` flag and the project name with the `--wandb_project` flag. 
 ```
 # With constant KLD loss weight
 python run.py -c configs/dec_cond_vae.yaml
@@ -34,5 +34,5 @@ python run.py -c configs/dec_cond_vae.yaml --kld_scheduler True
 
 Example with W&B logging:
 ```
-python run.py -c configs/dec_cond_vae.yaml --kld_scheduler True --wandb_entity example_entity_name
+python run.py -c configs/dec_cond_vae.yaml --kld_scheduler True --wandb_toggle True --wandb_entity example_entity_name
 ```
