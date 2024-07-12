@@ -90,25 +90,27 @@ except KeyError:
     print("Available models:\n", "\n".join([s for s in vae_models.keys()]))
     raise
 
+wandb_args = {
+    "use_wandb": args.wandb_toggle,
+}
+
 # setup wandb
 if args.wandb_toggle:
     wandb_run = wandb.init(project=args.wandb_project, entity=args.wandb_entity, config=config, name=args.wandb_name)
+    wandb_args["wandb_project"] = args.wandb_project
+    wandb_args["wandb_run"] = args.wandb_run
 
 if args.load_ckpt == "":
     experiment = VAEXperiment(model,
                         config['exp_params'],
-                        use_wandb=args.wandb_toggle,
-                        wandb_project=args.wandb_project,
-                        wandb_run=wandb_run,
+                        **wandb_args,
                         kld_scheduler=args.kld_scheduler,
                         log_params=config['logging_params'])
 else:
     experiment = VAEXperiment.load_from_checkpoint(args.load_ckpt,
                         vae_model=model,
                         params=config['exp_params'],
-                        use_wandb=args.wandb_toggle,
-                        wandb_project=args.wandb_project,
-                        wandb_run=wandb_run,
+                        **wandb_args,
                         kld_scheduler=args.kld_scheduler,
                         log_params=config['logging_params'])
 
