@@ -67,11 +67,11 @@ class VAEXperiment(pl.LightningModule):
         self.wandb_run = wandb_run
         self.wandb_project = wandb_project
 
-    def forward(self, img1: Tensor, img2_pose: Tensor, debug_info: dict = None, **kwargs) -> Tensor:
+    def forward(self, img1: Tensor, img2_pose: Tensor, **kwargs) -> Tensor:
         return self.model(img1, img2_pose, **kwargs)
 
     def training_step(self, batch, batch_idx, optimizer_idx = 0):
-        img1_pose, img1, img2_pose, img2 = batch
+        img1_pose, img1, img2_pose, img2, _ = batch
         self.curr_device = img1.device
 
         img2_hat, _, mu, log_var = self.forward(img1, img2_pose)
@@ -87,7 +87,7 @@ class VAEXperiment(pl.LightningModule):
 
 
     def validation_step(self, batch, batch_idx, optimizer_idx = 0):
-        img1_pose, img1, img2_pose, img2 = batch
+        img1_pose, img1, img2_pose, img2, _ = batch
         self.curr_device = img1.device
 
         img2_hat, _, mu, log_var = self.forward(img1, img2_pose)
@@ -267,7 +267,7 @@ class VAEXperiment(pl.LightningModule):
 
         scene_id = info['scene_id'][:N_VAL_IMAGES,...].to(self.curr_device)
         scene_id = torch.repeat_interleave(scene_id,N_VAL_VIEWS,dim=0)
-        recons = self.model.generate(test_input, v = test_label, debug_info = scene_id)
+        recons = self.model.generate(test_input, v = test_label)
 
         img_title = f"Encoder inputs (epoch {self.current_epoch})"
         img_name  = f"recons_{self.logger.name}_Epoch_{self.current_epoch}_input.png"
