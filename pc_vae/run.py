@@ -65,6 +65,7 @@ if args.wandb_toggle:
 else:
     tb_logger =  TensorBoardLogger(save_dir=config['logging_params']['save_dir'],
                                    name=config['model_params']['name'],)
+    tb_logger.log_dir = tb_logger.save_dir
 
 seed_everything(config['exp_params']['manual_seed'], True)
 
@@ -77,7 +78,6 @@ try:
     print("NUM VIEWS TRAIN", num_dataset_views)
     print("NUM VIEWS VALID", data.val_dataset.num_views + 1)
     print("NUM SCENES", data.val_dataset.num_scenes + 1)
-
 
     num_dataset_scenes = data.train_dataset.num_scenes + 1
 
