@@ -71,7 +71,7 @@ class VAEXperiment(pl.LightningModule):
         return self.model(img1, img2_pose, **kwargs)
 
     def training_step(self, batch, batch_idx, optimizer_idx = 0):
-        img1_pose, img1, img2_pose, img2, _ = batch
+        img1_pose, img1, img2_pose, img2 = batch
         self.curr_device = img1.device
 
         img2_hat, _, mu, log_var = self.forward(img1, img2_pose)
@@ -87,7 +87,7 @@ class VAEXperiment(pl.LightningModule):
 
 
     def validation_step(self, batch, batch_idx, optimizer_idx = 0):
-        img1_pose, img1, img2_pose, img2, _ = batch
+        img1_pose, img1, img2_pose, img2 = batch
         self.curr_device = img1.device
 
         img2_hat, _, mu, log_var = self.forward(img1, img2_pose)
