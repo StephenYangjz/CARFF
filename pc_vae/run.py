@@ -7,11 +7,12 @@ from models import *
 from experiment import VAEXperiment
 import torch.backends.cudnn as cudnn
 from pytorch_lightning import Trainer
-from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
+from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.utilities.seed import seed_everything
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from dataset import VAEDataset
 from pytorch_lightning.plugins import DDPPlugin
+from utils import NormalLogger
 
 import wandb
 
@@ -63,7 +64,7 @@ if args.wandb_toggle:
         name=config['model_params']['name'],)
     tb_logger.log_dir = tb_logger.save_dir
 else:
-    tb_logger =  TensorBoardLogger(save_dir=config['logging_params']['save_dir'],
+    tb_logger =  NormalLogger(save_dir=config['logging_params']['save_dir'],
                                    name=config['model_params']['name'],)
 
 seed_everything(config['exp_params']['manual_seed'], True)
