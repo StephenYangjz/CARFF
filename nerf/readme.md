@@ -30,10 +30,16 @@ set PATH=%PATH%;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8
 set LD_LIBRARY_PATH=%LD_LIBRARY_PATH%;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib64
 ```
 
-### Install with conda
-```bash
-conda env create -f environment.yml
+### Install with pip
+Create a conda environment:
+```
+conda create --name torch-ngp python=3.9
 conda activate torch-ngp
+```
+Install the requirements and TinyCUDANN:
+```
+pip install -r requirements.txt
+pip install git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
 ```
 
 ### Raymarching import errors
