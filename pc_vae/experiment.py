@@ -19,6 +19,10 @@ from torchvision.datasets.folder import default_loader
 import json
 from scipy.stats import norm
 
+"""
+    VAEXperiment class sets up the pipeline for training PC-VAE using PyTorch Lightning modules. W&B logging, KLD scheduling
+    and other parameters from the config files and command line flags in the README can be specified to modify the training. 
+"""
 class VAEXperiment(pl.LightningModule):
 
     def __init__(self,
@@ -39,6 +43,7 @@ class VAEXperiment(pl.LightningModule):
         self.kld_weights = [params['kld_weight']]
         self.kld_scheduler = kld_scheduler
 
+        # KLD scheduler described in the CARFF paper used to train the optimal version of PC-VAE
         def kld_exp_func(x):
             epoch_start_to_change = params['kld_start']
             converged_epoch = params['kld_end']
@@ -157,6 +162,9 @@ class VAEXperiment(pl.LightningModule):
     def generate_and_save_train_embeddings(self):
         self.generate_and_save_embeddings('transforms_train.json', f'transforms_train{self.current_epoch}.json')
 
+    """
+        Utilizes the KLD scheduler function kld_exp_func to modify the KLD weight every epoch.
+    """
     def increment_kld(self):
         if self.params['kld_weight'] < self.params['kld_max']:
             self.params['kld_weight'] = self.kld_exp_func(self.current_epoch + 1)
@@ -166,6 +174,9 @@ class VAEXperiment(pl.LightningModule):
         kld_plot = wandb.Table(data=data, columns=["Epochs", "KLD Weights"])
         self.wandb_log['KLD Weight Increments'] = wandb.plot.line(kld_plot, "Epochs", "KLD Weights", title="KLD Weights vs Epochs")
 
+    """
+        Logs the PSNR of the predictions on the training data.
+    """
     def log_train_psnr(self):
         train_metrics_loader = self.trainer.datamodule.train_metrics_dataloader()
         train_metrics_iter = iter(train_metrics_loader)
@@ -179,6 +190,9 @@ class VAEXperiment(pl.LightningModule):
         print("Average Train PSNR:", avg_psnr)
         self.wandb_log['Average Train PSNR'] = avg_psnr
         
+    """
+        Logs the PSNR of the predictions on the validation data.
+    """
     def log_val_psnr(self):
         viz_indices = [6, 34, 62]
         val_dataset = self.trainer.datamodule.val_dataset
@@ -225,6 +239,9 @@ class VAEXperiment(pl.LightningModule):
             wandb.log(self.wandb_log)
             self.wandb_log = {}
 
+    """
+        Samples images from different poses to generate model reconstructions as a grid as displayed in the CARFF paper. 
+    """
     def sample_images(self):
         loader = self.trainer.datamodule.train_dataloader()
         dataset = self.trainer.datamodule.train_dataset

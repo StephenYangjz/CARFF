@@ -24,6 +24,10 @@ class MyDataset(Dataset):
     def __getitem__(self, idx):
         pass
 
+"""
+    DidacticBlenderDataset sets up the data from the transforms.json file provided, including the scene_id, view_id, and 
+    file paths for training. If specified, adds extra training by duplicating the existing dataset.
+"""
 class DidacticBlenderDataset(Dataset):
 
     def __init__(self, 
@@ -91,7 +95,10 @@ class DidacticBlenderDataset(Dataset):
         
         return img, (scene,view)
 
-
+"""
+    DidacticBlenderDatasetPoseBatching extends the DidacticBlenderDataset and also provides the pose information for each
+    batch of data. It selects and returns a second image along with it's pose for training the pose-conditional decoder.
+"""
 class DidacticBlenderDatasetPoseBatching(DidacticBlenderDataset):
 
     def __getitem__(self, idx):
@@ -116,6 +123,9 @@ class DidacticBlenderDatasetPoseBatching(DidacticBlenderDataset):
 
         return img1_pose, img1, img2_pose, img2, info
 
+"""
+    Utilizes the DidacticBlender datasets in order to create dataloaders for training, testing and validation. 
+"""
 class VAEDataset(LightningDataModule):
     def __init__(
         self,

@@ -4,7 +4,9 @@ from torch import nn
 from torch.nn import functional as F
 from .types_ import *
 
-
+"""
+    PyTorch implementation of VanillaVAE.
+"""
 class VanillaVAE(BaseVAE):
     def __init__(self,
                  in_channels: int,

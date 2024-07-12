@@ -6,6 +6,11 @@ from .types_ import *
 from vit_pytorch import SimpleViT
 from torchvision.models import vit_l_16, resnet50, ResNet50_Weights, mobilenet_v2, MobileNet_V2_Weights
 
+"""
+    DecoderConditionalVAE class implements the PC-VAE architecture as described in our CARFF paper, 
+    extending the functionality of VanillaVAE.
+"""
+
 class DecoderConditionalVAE(VanillaVAE):
     def __init__(self,
                  in_channels: int,
@@ -29,6 +34,8 @@ class DecoderConditionalVAE(VanillaVAE):
         else:
             self.extra_decoder_inputs = 1
 
+        # Build the encoder 
+        # Adding the convolutional layers for the PC-VAE
         modules = []
         if hidden_dims is None:
             hidden_dims = [32, 64, 128, 256, 512]
@@ -39,6 +46,7 @@ class DecoderConditionalVAE(VanillaVAE):
              nn.BatchNorm2d(3),
              nn.LeakyReLU()))
 
+        # Adding the pre-trained ViT to the architecture
         vit = vit_l_16(
             weights="IMAGENET1K_V1",
             image_size=224
@@ -57,6 +65,7 @@ class DecoderConditionalVAE(VanillaVAE):
         for param in self.encoder[0].parameters():
             param.requires_grad = True
 
+        # Build the decoder
         modules = []
 
         if self.enable_cheating:
@@ -93,6 +102,9 @@ class DecoderConditionalVAE(VanillaVAE):
                                       kernel_size= 3, padding= 1),
                             nn.Tanh())
 
+    """
+        Decode using the latent z and pose v. 
+    """
     def decode(self, z: Tensor, v: Tensor, debug_info: dict = None) -> Tensor:
         if self.enable_cheating:
             assert debug_info is not None
@@ -105,6 +117,8 @@ class DecoderConditionalVAE(VanillaVAE):
             if len(v.shape) == 1:
                 v = v.unsqueeze(-1)
             assert v.shape == (z.shape[0], 1), (z.shape, v.shape)
+
+        # Conditioning on pose v by concatenating z and v.
         z_and_v = torch.cat([z, v], dim = 1).cuda()
         if self.enable_cheating:
             scene_id = debug_info
