@@ -62,10 +62,11 @@ class VAEXperiment(pl.LightningModule):
         self.conditional_decoder = isinstance(self.model, DecoderConditionalVAE)
         self.params = params
         self.curr_device = None
-        self.wandb_log = {}
         self.use_wandb = use_wandb
-        self.wandb_run = wandb_run
-        self.wandb_project = wandb_project
+        if self.use_wandb:
+            self.wandb_log = {}
+            self.wandb_run = wandb_run
+            self.wandb_project = wandb_project
 
     def forward(self, img1: Tensor, img2_pose: Tensor, **kwargs) -> Tensor:
         return self.model(img1, img2_pose, **kwargs)
@@ -171,8 +172,9 @@ class VAEXperiment(pl.LightningModule):
         self.kld_weights.append(self.params['kld_weight'])
         
         data = [[x, y] for (x, y) in zip(np.arange(0, self.current_epoch + 1), self.kld_weights)]
-        kld_plot = wandb.Table(data=data, columns=["Epochs", "KLD Weights"])
-        self.wandb_log['KLD Weight Increments'] = wandb.plot.line(kld_plot, "Epochs", "KLD Weights", title="KLD Weights vs Epochs")
+        if self.use_wandb:
+            kld_plot = wandb.Table(data=data, columns=["Epochs", "KLD Weights"])
+            self.wandb_log['KLD Weight Increments'] = wandb.plot.line(kld_plot, "Epochs", "KLD Weights", title="KLD Weights vs Epochs")
 
     """
         Logs the PSNR of the predictions on the training data.
@@ -188,7 +190,8 @@ class VAEXperiment(pl.LightningModule):
                 psnrs.append(PSNR(img2_hat[i].cuda(), img2[i].cuda()).item())
         avg_psnr = np.mean(psnrs)
         print("Average Train PSNR:", avg_psnr)
-        self.wandb_log['Average Train PSNR'] = avg_psnr
+        if self.use_wandb:
+            self.wandb_log['Average Train PSNR'] = avg_psnr
         
     """
         Logs the PSNR of the predictions on the validation data.
@@ -211,16 +214,18 @@ class VAEXperiment(pl.LightningModule):
 
                 if i in viz_indices:
                     logged_img = torch.cat([img1[i].cuda(), img2.squeeze(0).cuda(), img2_hat[i].cuda()], dim=1)
-                    wandb_img = wandb.Image(
-                        logged_img,
-                        caption=f'Input Image {i}, Image 2 GT, Image 2 Hat'
-                    )
-                    self.wandb_log[f'Image {i} Input->Recons'] = wandb_img
+                    if self.use_wandb:
+                        wandb_img = wandb.Image(
+                            logged_img,
+                            caption=f'Input Image {i}, Image 2 GT, Image 2 Hat'
+                        )
+                        self.wandb_log[f'Image {i} Input->Recons'] = wandb_img
 
                 psnrs.append(PSNR(img2_hat[i].cuda(), img2.cuda()).item())
         avg_psnr = np.mean(psnrs)
         print("Average Validation PSNR:", avg_psnr)
-        self.wandb_log['Average Validation PSNR'] = avg_psnr
+        if self.use_wandb:
+            self.wandb_log['Average Validation PSNR'] = avg_psnr
 
     def on_validation_end(self) -> None:
         self.sample_images()
