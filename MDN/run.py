@@ -98,8 +98,8 @@ def main(transform_path, save_model_path, config_path):
     plt.close()
 
     if not os.path.exists(save_model_path):
-        os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
-    model.save(os.path.dirname(save_model_path))
+        os.makedirs(save_model_path, exist_ok=True)
+    model.save(save_model_path)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the model with specified configurations.")
