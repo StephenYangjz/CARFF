@@ -6,7 +6,7 @@ Create a conda environment with Python 3.9
 conda create --name pc-vae python=3.9
 conda activate pc-vae
 ```
-```
+
 Install all dependencies
 ```
 pip install -r requirements.txt
