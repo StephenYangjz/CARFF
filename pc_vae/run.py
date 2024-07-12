@@ -65,7 +65,6 @@ if args.wandb_toggle:
 else:
     tb_logger =  TensorBoardLogger(save_dir=config['logging_params']['save_dir'],
                                    name=config['model_params']['name'],)
-    tb_logger.log_dir = tb_logger.save_dir
 
 seed_everything(config['exp_params']['manual_seed'], True)
 
@@ -127,9 +126,9 @@ runner = Trainer(logger=tb_logger,
                 **config['trainer_params'])
 
 
-Path(f"{tb_logger.log_dir}/Samples").mkdir(exist_ok=True, parents=True)
-Path(f"{tb_logger.log_dir}/Reconstructions").mkdir(exist_ok=True, parents=True)
-Path(f"{tb_logger.log_dir}/embeddings").mkdir(exist_ok=True, parents=True)
+Path(f"{tb_logger.save_dir}/Samples").mkdir(exist_ok=True, parents=True)
+Path(f"{tb_logger.save_dir}/Reconstructions").mkdir(exist_ok=True, parents=True)
+Path(f"{tb_logger.save_dir}/embeddings").mkdir(exist_ok=True, parents=True)
 
 
 print(f"======= Training {config['model_params']['name']} =======")
