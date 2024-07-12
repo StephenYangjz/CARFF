@@ -3,14 +3,14 @@
 This folder is the NeRF decoder implementation based on the pytorch implementation of [instant-ngp](https://github.com/NVlabs/instant-ngp), as described in [_Instant Neural Graphics Primitives with a Multiresolution Hash Encoding_](https://nvlabs.github.io/instant-ngp/assets/mueller2022instant.pdf).
 
 ### TinyCUDANN requirements
-Make sure to follow the requirements listed on the [TinyCUDANN] (https://github.com/NVlabs/tiny-cuda-nn) repository before creating the conda environment to avoid running into issues during setup:
+Make sure to follow the requirements listed on the [TinyCUDANN](https://github.com/NVlabs/tiny-cuda-nn) repository before creating the conda environment to avoid running into issues during setup:
 - A C++14 capable compiler. The following choices are recommended and have been tested:
     - Windows: Visual Studio 2019 or 2022
     - Linux: GCC/G++ 8 or higher
-- A recent version of [CUDA] (https://developer.nvidia.com/cuda-toolkit). The following choices are recommended and have been tested:
+- A recent version of [CUDA](https://developer.nvidia.com/cuda-toolkit). The following choices are recommended and have been tested:
     - Windows: CUDA 11.5 or higher
     - Linux: CUDA 10.2 or higher
-- [CMake] (https://cmake.org/) v3.21 or higher.
+- [CMake](https://cmake.org/) v3.21 or higher.
 
 **Linux**
 Run the following command to install the following packages:
