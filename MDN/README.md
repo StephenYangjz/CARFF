@@ -20,3 +20,5 @@ Provide the `transforms.json` file containing the embeddings saved by the PC-VAE
 ```
 python run.py --transform_path ./transforms_val.json --save_model_path mdn_checkpoint
 ```
+
+The code also saves a plot of the loss over epochs for the MDN model to ensure that the training performed correctly to `mdn_loss.png`.
