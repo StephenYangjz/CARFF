@@ -97,12 +97,14 @@ def main(transform_path, save_model_path, config_path):
     plt.savefig("mdn_loss.png")
     plt.close()
 
+    if not os.path.exists(save_model_path):
+        os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
     model.save(os.path.dirname(save_model_path))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the model with specified configurations.")
     parser.add_argument("--transform_path", type=str, required=True, help="File path for the transforms.")
-    parser.add_argument("--save_model_path", type=str, required=True, help="File path to save the model.")
+    parser.add_argument("--save_model_path", type=str, required=True, help="Directory path to save the model.")
     parser.add_argument("--config_path", type=str, default="./mdn_config.yaml", help="File path for the MDN training and model configs.")
     
     args = parser.parse_args()

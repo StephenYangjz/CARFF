@@ -16,7 +16,7 @@ pip install -r requirements.txt
 ### Configuration setup
 Optionally modify experiment and MDN model parameters in `mdn_config.yaml`. By default the code uses this path for the configuration file. To provide a new one use the `--config_path` flag.
 
-Provide the `transforms.json` file containing the embeddings saved by the PC-VAE using the `--transform_path` flag and provide a path to save the MDN model checkpoint using the `--save_model_path` flag. Below is an example of how to run the code:
+Provide the `transforms.json` file containing the embeddings saved by the PC-VAE using the `--transform_path` flag and provide a directory path to save the MDN model checkpoint using the `--save_model_path` flag. Below is an example of how to run the code:
 ```
 python run.py --transform_path ./transforms_val.json --save_model_path mdn_checkpoint
 ```
