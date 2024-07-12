@@ -75,7 +75,7 @@ def main(transform_path, save_model_path, config_path):
             weights, mu_preds, var_preds = model(batch_X)
 
             samples_sobol = sobol_engine.draw(exp_params["num_samples"]).to(torch.float).to(device)
-            samples_sobol = samples_sobol[None,:,None,:].repeat(batch_y.shape[0], 1, model_params[model_params["K"]], 1)
+            samples_sobol = samples_sobol[None,:,None,:].repeat(batch_y.shape[0], 1, model_params["K"], 1)
             
             batch_y = batch_y[:,None,None,:].repeat(1, exp_params["num_samples"], model_params["K"], 1)
             latent_vectors = samples_sobol * torch.exp(batch_y[..., model_params["latent_dim"]:]) + batch_y[...,:model_params["latent_dim"]]
