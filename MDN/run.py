@@ -106,5 +106,5 @@ if __name__ == "__main__":
     parser.add_argument("--config_path", type=str, default="./mdn_config.yaml", help="File path for the MDN training and model configs.")
     
     args = parser.parse_args()
-    main(args.transform_path, args.save_model_path)
+    main(args.transform_path, args.save_model_path, args.config_path)
 
