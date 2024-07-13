@@ -10,6 +10,7 @@ Make sure to follow the requirements listed on the [TinyCUDANN](https://github.c
 - A recent version of [CUDA](https://developer.nvidia.com/cuda-toolkit). The following choices are recommended and have been tested:
     - Windows: CUDA 11.5 or higher
     - Linux: CUDA 10.2 or higher
+- Install the version of [PyTorch](https://pytorch.org/get-started/locally/) that matches your CUDA installation to avoid failing setup for TCNN
 - [CMake](https://cmake.org/) v3.21 or higher.
 
 **Linux**
@@ -38,6 +39,8 @@ conda activate torch-ngp
 ```
 Install the requirements and TinyCUDANN:
 ```
+# For CUDA 11.8 torch installation -- change this to your version of CUDA
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 pip install -r requirements.txt
 pip install git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
 ```
