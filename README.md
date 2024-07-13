@@ -12,7 +12,7 @@ We propose CARFF, a method for predicting future 3D scenes given past observatio
 
 ### `Configure environment`
 
-Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) (recommended) or [Anaconda](https://www.anaconda.com/).
+Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Miniforge](https://github.com/conda-forge/miniforge).
 
 Please follow the readme files for each folder to create and activate a virtual environment for each subpart of this repository.
 
