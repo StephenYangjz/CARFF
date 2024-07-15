@@ -97,8 +97,8 @@ class NeRFGUI:
         self.downscale = 1
         self.train_steps = 16
 
-        dpg.create_context()
         if gui:
+            dpg.create_context()
             self.register_dpg()
         self.test_step()
 
@@ -176,10 +176,10 @@ class NeRFGUI:
         print("Input correspinds to:", self.train_loader._data.paths[indices[0]])
         return indices[0]
 
-    def render_bev(self, dest_path=None):
+    def render_bev(self, dest_path=None, view=2):
         indices = {}
         for i, item in enumerate(self.train_loader._data.paths):
-            if item.startswith("train/cam-v2-") or item.startswith("train_ego_actor/cam-v2-"):
+            if item.startswith(f"train/cam-v{view}-") or item.startswith(f"train_ego_actor/cam-v{view}-"):
                 indices[item] = i
         if len(indices) == 0:
             raise ValueError("Dataset not supported for probing.")
@@ -196,10 +196,10 @@ class NeRFGUI:
             save_image(pred_img.permute(2, 0, 1), dest_path)
         return pred_img
 
-    def calculate_densities(self, timestamp):
+    def calculate_densities(self, timestamp, view=2):
         indices = {}
         for i, item in enumerate(self.train_loader._data.paths):
-            if item.startswith("train/cam-v2-") or item.startswith("train_ego_actor/cam-v2-"):
+            if item.startswith(f"train/cam-v{view}-") or item.startswith(f"train_ego_actor/cam-v{view}-"):
                 indices[item] = i
         # print(indices)
         if len(indices) == 0:
@@ -214,10 +214,10 @@ class NeRFGUI:
         outputs = self.trainer.test_gui(poses, intrinsics, W, H, latents, bg_color=None, spp=1, downscale=1, timestamp=timestamp)
         return outputs['mean_density']
 
-    def probe(self):
+    def probe(self, view=2):
         indices = {}
         for i, item in enumerate(self.train_loader._data.paths):
-            if item.startswith("train/cam-v2-") or item.startswith("train_ego_actor/cam-v2-"):
+            if item.startswith(f"train/cam-v{view}-") or item.startswith(f"train_ego_actor/cam-v{view}-"):
                 indices[item] = i
         # print(indices)
         if len(indices) == 0:
@@ -243,10 +243,10 @@ class NeRFGUI:
         # get the distribution for that result
         return indices[probed_result]
 
-    def probe_densities(self):
+    def probe_densities_carla(self, view=2):
         indices = {}
         for i, item in enumerate(self.train_loader._data.paths):
-            if item.startswith("train/cam-v2-") or item.startswith("train_ego_actor/cam-v2-"):
+            if item.startswith(f"train/cam-v{view}-") or item.startswith(f"train_ego_actor/cam-v{view}-"):
                 indices[item] = i
         densities = {}
         for i in range(6):
@@ -469,7 +469,7 @@ class NeRFGUI:
                     print("Successfully transferred to the next stage based on probed result.")
 
                 def callback_probe_density(sender, app_data):
-                    _, result_index = self.probe_densities()
+                    _, result_index = self.probe_densities_carla()
                     mus = self.train_loader._data.mus[result_index].cuda()
                     vars = self.train_loader._data.vars[result_index].cuda()
                     # one hot encode
@@ -477,7 +477,7 @@ class NeRFGUI:
                     input_data = torch.cat([mus, vars]).unsqueeze(0).cuda()
                     sampled_latent, weight, mu, sigma = self.MDN.sample(input_data)
                     predicted_latent = sampled_latent.squeeze(0)
-                    current_t, _ = self.probe_densities()
+                    current_t, _ = self.probe_densities_carla()
                     print("Predicted:", current_t)
                     self.test_latent = predicted_latent
                     self.need_update = True
