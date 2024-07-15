@@ -63,7 +63,13 @@ python main_nerf.py path/to/data --workspace workspace_name
 
 ### Terminal interactive Torch-NGP
 
-We include a file called `terminal_nerf.py` that can be used to run an interactive version of Torch-NGP from the terminal without loading the GUI. In order to run the NeRF utilizing the MDN, you need to have the MDN checkpoint path in the main directory of the dataset path. The interactive session can be run using the following command:
+We include a file called `terminal_nerf.py` that can be used to run an interactive version of Torch-NGP from the terminal without loading the GUI. 
+
+Setup the dataset and the MDN checkpoint:
+- Place the MDN checkpoint, `checkpoint.pth` in the dataset path directory.
+- Replace the transforms files in the dataset path directory with the saved embeddings transforms files from the PC-VAE training in order to provide NeRF access to the saved latents.
+
+The interactive session can be run using the following command:
 ```
 python -i terminal_nerf.py --dataset_path path/to/data
 ```
