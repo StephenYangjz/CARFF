@@ -59,7 +59,7 @@ def main(transform_path, save_model_path, config_path):
     sobol_engine = SobolEngine(dimension=model_params["latent_dim"], scramble=True)
     model = MDN(2 * model_params["latent_dim"],model_params["latent_dim"], model_params["K"], model_params["hidden_dim"]).to(device)
 
-    dataset = TensorDataset(mus, log_vars, latents, device)
+    dataset = TensorDataset(mus, log_vars, latents, (-exp_params["perturb_range"], exp_params["perturb_range"]), device)
     dataloader = DataLoader(dataset, batch_size=exp_params["batch_size"], shuffle=True)
 
     progress_bar = tqdm.tqdm(range(exp_params["num_epochs"]), desc="Loss: ---", position=0)

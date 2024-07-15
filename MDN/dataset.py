@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 import torch.nn.functional as F
 
 class TensorDataset(Dataset):
-    def __init__(self, all_mus, all_vars, all_latents, device):
+    def __init__(self, all_mus, all_vars, all_latents, perturb_range, device):
         assert len(all_mus) == len(all_vars)
         self.device = device
         self.all_mus = self.lists_to_tensors(all_mus)
@@ -13,6 +13,7 @@ class TensorDataset(Dataset):
         self.num_scenes = len(all_mus)
         self.num_views = len(all_mus[all_mus.keys()[0]])
         self.num_scenes_temp = self.num_scenes + 1
+        self.perturb_range = perturb_range
     
     def lists_to_tensors(self, dictionary):
         for key, value in dictionary.items():
@@ -35,7 +36,7 @@ class TensorDataset(Dataset):
         # start_latents = self.all_latents[start_scene][idx]
         start_var = self.all_vars[start_scene][idx]
         
-        idx = idx + torch.randint(-4, 4, (1,))[0]
+        idx = idx + torch.randint(-self.perturb_range[0], self.perturb_range[1], (1,))[0]
         if idx >= self.num_views:
             idx = self.num_views - 1
         end_mu = self.all_mus[end_scene][idx]
