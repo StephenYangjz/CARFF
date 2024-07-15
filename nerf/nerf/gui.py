@@ -97,8 +97,8 @@ class NeRFGUI:
         self.downscale = 1
         self.train_steps = 16
 
+        dpg.create_context()
         if gui:
-            dpg.create_context()
             self.register_dpg()
         self.test_step()
 
@@ -637,7 +637,6 @@ class NeRFGUI:
 
 
     def render(self):
-
         while dpg.is_dearpygui_running():
             # update texture every frame
             if self.training:
