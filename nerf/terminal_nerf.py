@@ -9,8 +9,12 @@ from loss import huber_loss
 from init import init
 from nerf.network_tcnn import NeRFNetwork
 
-def main(dataset_path):
-    opt = init(dataset_path)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Load and process dataset.")
+    parser.add_argument("--dataset_path", type=str, required=True, help="File path for the dataset.")
+    args = parser.parse_args()
+    
+    opt = init(args.dataset_path)
     seed_everything(0)
     assert opt.bg_radius <= 0, "background model is not implemented for --tcnn"
 
@@ -34,8 +38,3 @@ def main(dataset_path):
 
     gui.render_no_gui(1800)
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Load and process dataset.")
-    parser.add_argument("--dataset_path", type=str, required=True, help="File path for the dataset.")
-    args = parser.parse_args()
-    main(args.dataset_path)
