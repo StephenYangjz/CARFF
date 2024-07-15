@@ -1,0 +1,12 @@
+model_params:
+  K: 2
+  hidden_dim: 512
+  latent_dim: 8
+
+exp_params:
+  batch_size: 128
+  num_epochs: 30000
+  lr: 0.005
+  num_samples: 1000
+  perturb_range: 4
+
