@@ -5,7 +5,7 @@ model_params:
 
 exp_params:
   batch_size: 128
-  num_epochs: 30000
+  num_epochs: 5000
   lr: 0.005
   num_samples: 1000
   perturb_range: 1
