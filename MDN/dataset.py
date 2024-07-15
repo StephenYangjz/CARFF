@@ -36,7 +36,8 @@ class TensorDataset(Dataset):
         # start_latents = self.all_latents[start_scene][idx]
         start_var = self.all_vars[start_scene][idx]
         
-        idx = idx + torch.randint(-self.perturb_range, self.perturb_range, (1,))[0]
+        idx_val = torch.randint(-self.perturb_range, self.perturb_range, (1,))[0] if self.perturb_range > 0 else 0
+        idx = idx + idx_val
         if idx >= self.num_views:
             idx = self.num_views - 1
         end_mu = self.all_mus[end_scene][idx]

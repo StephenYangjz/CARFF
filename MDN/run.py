@@ -105,7 +105,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the model with specified configurations.")
     parser.add_argument("--transform_path", type=str, required=True, help="File path for the transforms.")
     parser.add_argument("--save_model_path", type=str, required=True, help="Directory path to save the model.")
-    parser.add_argument("--config_path", type=str, default="./mdn_config.yaml", help="File path for the MDN training and model configs.")
+    parser.add_argument("--config_path", type=str, default="./config.yaml", help="File path for the MDN training and model configs.")
     
     args = parser.parse_args()
     main(args.transform_path, args.save_model_path, args.config_path)
