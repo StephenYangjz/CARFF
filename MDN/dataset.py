@@ -11,7 +11,7 @@ class TensorDataset(Dataset):
         self.all_vars = self.lists_to_tensors(all_vars)
         self.all_latents = self.lists_to_tensors(all_latents)
         self.num_scenes = len(all_mus)
-        self.num_views = len(all_mus[all_mus.keys()[0]])
+        self.num_views = len(all_mus[list(all_mus.keys())[0]])
         self.num_scenes_temp = self.num_scenes + 1
         self.perturb_range = perturb_range
     
