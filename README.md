@@ -1,7 +1,7 @@
 # CARFF: Conditional Auto-encoded Radiance Field for Forecasting (Accepted to ECCV 2024)
 
 
-[Project Page With Video](https://www.carff.website/)
+[Project Page With Video](https://stephenyangjz.github.io/carff_website)
 
 This is an official implementation. The codebase is implemented using [PyTorch](https://pytorch.org/) and tested on [Ubuntu](https://ubuntu.com/) 22.04.2 LTS.
 
