@@ -56,8 +56,6 @@ CARFF-based controllers outperform baseline controllers by choosing the optimal 
 [[4] Is Anyone There? Learning a Planner Contingent on Perceptual Uncertainty (CoRL 2022)](https://openreview.net/forum?id=2CSj965d9O4)
 
 ## License and Citation
-
-Anonymized 
 <!-- ```bibtex
 @article{yang2023carff,
   title={{CARFF}: Conditional Auto-encoded Radiance Field for 3D Scene Forecasting},
@@ -67,3 +65,29 @@ Anonymized
   year={2023}
 }
 ``` -->
+```
+@InProceedings{10.1007/978-3-031-73024-5_14,
+author="Yang, Jiezhi
+and Desai, Khushi
+and Packer, Charles
+and Bhatia, Harshil
+and Rhinehart, Nicholas
+and McAllister, Rowan
+and Gonzalez, Joseph E.",
+editor="Leonardis, Ale{\v{s}}
+and Ricci, Elisa
+and Roth, Stefan
+and Russakovsky, Olga
+and Sattler, Torsten
+and Varol, G{\"u}l",
+title="CARFF: Conditional Auto-Encoded Radiance Field for 3D Scene Forecasting",
+booktitle="Computer Vision -- ECCV 2024",
+year="2025",
+publisher="Springer Nature Switzerland",
+address="Cham",
+pages="225--242",
+abstract="We propose CARFF: Conditional Auto-encoded Radiance Field for 3D Scene Forecasting, a method for predicting future 3D scenes given past observations. Our method maps 2D ego-centric images to a distribution over plausible 3D latent scene configurations and predicts the evolution of hypothesized scenes through time. Our latents condition a global Neural Radiance Field (NeRF) to represent a 3D scene model, enabling explainable predictions and straightforward downstream planning. This approach models the world as a POMDP and considers complex scenarios of uncertainty in environmental states and dynamics. Specifically, we employ a two-stage training of Pose-Conditional-VAE and NeRF to learn 3D representations, and auto-regressively predict latent scene representations utilizing a mixture density network. We demonstrate the utility of our method in scenarios using the CARLA driving simulator, where CARFF enables efficient trajectory and contingency planning in complex multi-agent autonomous driving scenarios involving occlusions. Video and code are available at: www.carff.website.",
+isbn="978-3-031-73024-5"
+}
+```
+
